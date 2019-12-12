@@ -14,6 +14,12 @@ h1{
   text-align: center;
 }
 
+.card{
+  display: grid;  
+}
+
+/* Utilities */
+
 .loader {
   border-top: 16px solid blue;
   border-right: 16px solid green;
