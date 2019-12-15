@@ -1,0 +1,62 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #e1e1e1;
+}
+
+nav{
+  display: flex;
+  align-content: center;
+  justify-content: space-around;
+}
+
+h1{
+  text-align: center;
+}
+
+.card{
+  display: grid; 
+  justify-content: center;
+}
+
+#cart{
+  position: fixed;
+  z-index: 500;
+  background-color: white;
+  width: 90%;
+  border: 1px solid #ccc;
+  box-shadow: 1px 1px 1px black;
+  padding: 16px;
+  left: 5%;
+  top: 30%;
+  box-sizing: border-box;
+  transition: all 0.3s ease-out;
+}
+
+.card-cart{
+  display: grid; 
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.card-cart img{
+  width: 50%
+}
+
+/* Utilities */
+
+.loader {
+  border-top: 16px solid blue;
+  border-right: 16px solid green;
+  border-bottom: 16px solid red;
+  border-left: 16px solid pink;
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
