@@ -1,50 +1,41 @@
-//const {createDomElement, addToDom} = require("./utils");
+const {createDomElement, addToDom} = require("./utils");
 let buttonSelector = null
 let loading = false;
 let data = null;
 let error = null;
 let cartItems = [];
-let buyCart = document.getElementById("cart")
-buyCart.style.display = "none"
+
+const buyCart = document.getElementById("cart")
+buyCart.addEventListener("click", (e) =>{
+  console.log("Toggle Cart")
+  toggleCart()
+})
 
 function toggleCart(){
-  if (buyCart.style.display === "none") {
-    buyCart.style.display = "block";
-    if(cartItems.length !== 0){
-      drawCartCards()
-      //addBtnHandlers()
-    }
-    else{
-      let card = document.createElement("div");
-      card.innerText = "Cart Empty"
-      document.querySelector("#cart").appendChild(card)
-    }
-  } else {
-    document.querySelector("#cart").innerHTML = null
-    buyCart.style.display = "none";
-  }
+  drawCartCards()
 }
 
-function btnHandler(btnAttribute, itemId){
-  switch(btnAttribute){
-    case("buy-now"):      
-    break;
-    case("add-to-cart"):
-    console.log("Add to Cart")     
-    addToCart(itemId)
-    break;
-    case("remove-from-cart"):      
-    removeFromCart(itemId)
-    break;
-  }
-}
+// function toggleCart(){
+//   if (cart.style.display === "none") {
+//     buyCart.style.display = "block";
+//     if(cartItems.length !== 0){
+//       drawCartCards()
+//     }
+//     else{
+//       let card = document.createElement("div");
+//       card.innerText = "Cart Empty"
+//       document.querySelector("#cart-items").appendChild(card)
+//     }
+//   } else {
+//     document.querySelector("#cart-items").innerHTML = null
+//   }
+// }
 
 function addToCart(itemId){
   const cartItem = data.find(item => {
     return item.id == itemId
   })
   cartItems.push(cartItem)
-  console.log(cartItems)
   saveToLocalStorage(cartItems)
 }
 
@@ -53,9 +44,11 @@ function saveToLocalStorage(cartItems){
 }
 
 function getFromLocalStorage(){
-  if(window.localStorage.length != 0){
-    cartItems = JSON.parse(window.localStorage.getItem("cartdata"))
-  }  
+  for(i=0; i < window.localStorage.length; i++){
+    if(window.localStorage.key(i) === "cartdata"){
+      cartItems = JSON.parse(window.localStorage.getItem("cartdata"))
+    }
+  }
 }
 
 function removeFromCart(itemId){
@@ -91,28 +84,33 @@ function spinner(){
 
 function drawCard (element, i){
   let card = document.createElement("div");
-  let price = document.createElement("h4")
-  let pic = document.createElement("img")
-  let brand = document.createElement("h3")
+  const price = createDomElement("h4", {innerText: element.price})
+  const pic = createDomElement("img", {src: element.image_link})
+  const brand = createDomElement("h3", {innerText:element.brand})
   let buyBtn = document.createElement("button")
   let cartBtn = document.createElement("button")
   card.className = "card"
   card.id = element.id
-  price.innerText = element.price
-  pic.src = element.image_link
-  brand.innerText = element.brand
   buyBtn.innerText = "Buy Now"
   buyBtn.type = "submit"
-  buyBtn.id = "buy-now"
+  buyBtn.addEventListener("click", () =>{
+    console.log("I will buy now", element.id)
+  })
   cartBtn.innerText = "Add to Cart"
   cartBtn.type = "submit"
-  cartBtn.id = "add-to-cart"
-  document.querySelector("#app").appendChild(card)
-  document.querySelector(`#app > div:nth-child(${i+1})`).appendChild(pic)
-  document.querySelector(`#app > div:nth-child(${i+1})`).appendChild(price)
-  document.querySelector(`#app > div:nth-child(${i+1})`).appendChild(brand)
-  document.querySelector(`#app > div:nth-child(${i+1})`).appendChild(buyBtn)
-  document.querySelector(`#app > div:nth-child(${i+1})`).appendChild(cartBtn)
+  cartBtn.addEventListener("click", () =>{  
+    addToCart(element.id)
+  })
+  
+  addToDom("#app", card)
+  Array.from([pic, price, brand, buyBtn, cartBtn]).forEach(content =>{
+  addToDom(card, content)
+  })
+  // addToDom(card, pic)
+  // card.appendChild(price)
+  // card.appendChild(brand)
+  // card.appendChild(buyBtn)
+  // card.appendChild(cartBtn)
 }
 
 
@@ -127,33 +125,24 @@ function drawCartCard(el, i){
   let pic = document.createElement("img");
   let price = document.createElement("h4");
   let removeBtn = document.createElement("button");  
-  card.className = "card-cart"
+  card.className = "cart-card"
   price.innerText = el.price
   pic.src = el.image_link 
   removeBtn.innerText = "Remove"
-  removeBtn.id = "remove-from-cart"
   removeBtn.type = "submit"
-  document.querySelector("#cart").appendChild(card)
-  document.querySelector(`#cart > div:nth-child(${i+1})`).appendChild(pic)
-  document.querySelector(`#cart > div:nth-child(${i+1})`).appendChild(price)
-  document.querySelector(`#cart > div:nth-child(${i+1})`).appendChild(removeBtn)
+  removeBtn.addEventListener("click", () =>{  
+    removeFromCart(el.id)
+  })
+  document.querySelector("#cart-items").appendChild(card)
+  document.querySelector(`#cart-items > div:nth-child(${i+1})`).appendChild(pic)
+  document.querySelector(`#cart-items > div:nth-child(${i+1})`).appendChild(price)
+  document.querySelector(`#cart-items > div:nth-child(${i+1})`).appendChild(removeBtn)
 }
 
 function drawCartCards(){
   cartItems.forEach((el, i) => {
     drawCartCard(el, i)
   });
-}
-
-function addBtnHandlers(){
-  buttonSelector = document.querySelectorAll("button")
-  buttonSelector.forEach(btn => {
-    btn.addEventListener("click", (e) => {
-      const btnAttribute = e.target.id
-      const itemId = e.target.parentNode.id
-      btnHandler(btnAttribute, itemId)
-    })
-  })
 }
 
 function renderError(){
@@ -167,7 +156,6 @@ function render(){
   }
   if(data){
     drawCards()
-    addBtnHandlers()
   }
   if(error){
     renderError()
